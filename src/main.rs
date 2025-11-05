@@ -1,122 +1,90 @@
-use std::fs;
-use std::io::Write;
+use clap::{Parser, Subcommand};
+use dsa::modules::{discovery, runner, updater};
+
+#[derive(Parser)]
+#[command(name = "leetcode")]
+#[command(about = "LeetCode Problem Manager", long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Update Cargo.toml with all discovered problems
+    Update,
+
+    /// List all available problems
+    List {
+        /// Optional: Filter by category (e.g., "array", "linked-list")
+        category: Option<String>,
+    },
+
+    /// Run a specific problem by name
+    Run {
+        /// Problem name (e.g., "two_sum")
+        name: String,
+    },
+}
 
 fn main() {
-    println!("🔍 Scanning for LeetCode solutions...\n");
+    let cli = Cli::parse();
 
-    let mut binaries = Vec::new();
-
-    // Read all entries in the root directory
-    if let Ok(entries) = fs::read_dir(".") {
-        for entry in entries.flatten() {
-            let path = entry.path();
-
-            // Look for directories that start with digits (like 01-array, 02-linked-list)
-            if path.is_dir() {
-                if let Some(dir_name) = path.file_name().and_then(|s| s.to_str()) {
-                    // Check if directory name starts with a digit
-                    if dir_name
-                        .chars()
-                        .next()
-                        .map_or(false, |c| c.is_ascii_digit())
-                    {
-                        println!("📁 Found category: {}", dir_name);
-
-                        // Scan for .rs files inside this directory
-                        if let Ok(rs_files) = fs::read_dir(&path) {
-                            for file_entry in rs_files.flatten() {
-                                let file_path = file_entry.path();
-
-                                if file_path.extension().and_then(|s| s.to_str()) == Some("rs") {
-                                    if let Some(file_name) =
-                                        file_path.file_stem().and_then(|s| s.to_str())
-                                    {
-                                        let relative_path =
-                                            format!("{}/{}.rs", dir_name, file_name);
-                                        binaries.push((file_name.to_string(), relative_path));
-                                        println!("  ✓ {}", file_name);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    match cli.command {
+        Some(Commands::Update) => {
+            handle_update();
+        }
+        Some(Commands::List { category }) => {
+            handle_list(category);
+        }
+        Some(Commands::Run { name }) => {
+            handle_run(name);
+        }
+        None => {
+            // Default: Update Cargo.toml
+            handle_update();
         }
     }
+}
 
-    if binaries.is_empty() {
-        println!("⚠️  No LeetCode solutions found in numbered directories (e.g., 01-array/)");
+fn handle_update() {
+    let problems = discovery::discover_problems();
+
+    if problems.is_empty() {
+        println!("⚠️  No LeetCode solutions found!");
         println!("💡 Create directories like: 01-array/, 02-linked-list/, etc.");
         return;
     }
 
-    // Sort binaries alphabetically for consistency
-    binaries.sort_by(|a, b| a.0.cmp(&b.0));
-
-    println!("\n📝 Updating Cargo.toml...");
-
-    // Read existing Cargo.toml
-    let cargo_toml_path = "Cargo.toml";
-    let cargo_content = fs::read_to_string(cargo_toml_path).expect("❌ Failed to read Cargo.toml");
-
-    // Split content and remove existing [[bin]] sections
-    let lines: Vec<&str> = cargo_content.lines().collect();
-    let mut new_lines = Vec::new();
-    let mut skip_bin_section = false;
-
-    for line in lines {
-        if line.trim().starts_with("[[bin]]") {
-            skip_bin_section = true;
-            continue;
-        }
-
-        if skip_bin_section {
-            // Skip name and path lines in bin sections
-            if line.trim().starts_with("name =") || line.trim().starts_with("path =") {
-                continue;
-            }
-            // Empty line after bin section
-            if line.trim().is_empty() {
-                skip_bin_section = false;
-                continue;
+    match updater::update_cargo_toml(&problems) {
+        Ok(_) => {
+            println!("\n🚀 Usage:");
+            println!("   cargo run --bin <solution_name>");
+            println!("\n📋 Available solutions:");
+            for problem in problems {
+                println!("   cargo run --bin {}", problem.bin_name);
             }
         }
-
-        new_lines.push(line);
+        Err(e) => eprintln!("{}", e),
     }
+}
 
-    // Remove trailing empty lines
-    while new_lines.last() == Some(&"") {
-        new_lines.pop();
-    }
+fn handle_list(category: Option<String>) {
+    let problems = match category {
+        Some(cat) => discovery::list_by_category(&cat),
+        None => discovery::discover_problems(),
+    };
 
-    // Build new Cargo.toml content
-    let mut new_content = new_lines.join("\n");
-    new_content.push_str("\n\n# Auto-generated binary entries\n");
+    discovery::print_problems(&problems);
+}
 
-    // Add all binary declarations
-    for (name, path) in &binaries {
-        new_content.push_str(&format!("[[bin]]\n"));
-        new_content.push_str(&format!("name = \"{}\"\n", name));
-        new_content.push_str(&format!("path = \"{}\"\n", path));
-        new_content.push_str("\n");
-    }
+fn handle_run(name: String) {
+    let problems = discovery::discover_problems();
 
-    // Write back to Cargo.toml
-    let mut file = fs::File::create(cargo_toml_path).expect("❌ Failed to write Cargo.toml");
-
-    file.write_all(new_content.as_bytes())
-        .expect("❌ Failed to write content");
-
-    println!(
-        "\n✅ Successfully updated Cargo.toml with {} binaries!",
-        binaries.len()
-    );
-    println!("\n🚀 Usage:");
-    println!("   cargo run --bin <solution_name>");
-    println!("\n📋 Available solutions:");
-    for (name, _) in binaries {
-        println!("   cargo run --bin {}", name);
+    if let Some(problem) = problems.iter().find(|p| p.bin_name == name) {
+        runner::run_problem(problem);
+    } else {
+        println!("❌ Problem '{}' not found.", name);
+        println!("💡 Use 'cargo run list' to see available problems");
     }
 }
