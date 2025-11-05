@@ -2,5 +2,13 @@
 name = "dsa"
 version = "0.1.0"
 edition = "2024"
+default-run = "dsa"
 
 [dependencies]
+clap = { version = "4.5.51", features = ["derive"] }
+
+# Auto-generated binary entries
+[[bin]]
+name = "two_sum"
+path = "01-arrays/two_sum.rs"
+
