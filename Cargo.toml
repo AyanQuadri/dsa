@@ -7,9 +7,10 @@ default-run = "dsa"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 
-# Auto-generated binary entries
+[[bin]]
+name = "plus_one"
+path = "01-arrays/plus_one.rs"
 
-# Auto-generated binary entries
 [[bin]]
 name = "two_sum"
 path = "01-arrays/two_sum.rs"
