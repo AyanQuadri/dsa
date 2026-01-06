@@ -8,6 +8,11 @@ default-run = "dsa"
 clap = { version = "4.5.51", features = ["derive"] }
 
 [[bin]]
+name = "two_sumP"
+path = "practice/practice.rs"
+
+# Auto-generated binary entries
+[[bin]]
 name = "plus_one"
 path = "01-arrays/plus_one.rs"
 
