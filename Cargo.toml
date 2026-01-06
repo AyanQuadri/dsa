@@ -17,6 +17,10 @@ name = "plus_one"
 path = "01-arrays/plus_one.rs"
 
 [[bin]]
+name = "remove_duplicates"
+path = "01-arrays/remove_duplicates.rs"
+
+[[bin]]
 name = "two_sum"
 path = "01-arrays/two_sum.rs"
 
