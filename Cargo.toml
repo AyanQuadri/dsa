@@ -7,11 +7,14 @@ default-run = "dsa"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 
-
 # Auto-generated binary entries
 [[bin]]
 name = "best_time_stocks"
 path = "01-arrays/best_time_stocks.rs"
+
+[[bin]]
+name = "contains_duplicate"
+path = "01-arrays/contains_duplicate.rs"
 
 [[bin]]
 name = "plus_one"
