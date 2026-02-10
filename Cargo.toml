@@ -7,9 +7,6 @@ default-run = "dsa"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 
-[[bin]]
-name = "practice"
-path = "practice/practice.rs"
 
 # Auto-generated binary entries
 [[bin]]
@@ -19,6 +16,10 @@ path = "01-arrays/best_time_stocks.rs"
 [[bin]]
 name = "contains_duplicate"
 path = "01-arrays/contains_duplicate.rs"
+
+[[bin]]
+name = "maximum_subarray"
+path = "01-arrays/maximum_subarray.rs"
 
 [[bin]]
 name = "plus_one"
@@ -36,3 +37,6 @@ path = "01-arrays/remove_duplicates.rs"
 name = "two_sum"
 path = "01-arrays/two_sum.rs"
 
+[[bin]]
+name = "practice"
+path = "practice/practice.rs"
