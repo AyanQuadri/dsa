@@ -7,7 +7,6 @@ default-run = "dsa"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 
-
 [[bin]]
 name = "practice"
 path = "practice/practice.rs"
@@ -36,6 +35,10 @@ path = "01-arrays/product_except_self.rs"
 [[bin]]
 name = "remove_duplicates"
 path = "01-arrays/remove_duplicates.rs"
+
+[[bin]]
+name = "rotate_array"
+path = "01-arrays/rotate_array.rs"
 
 [[bin]]
 name = "three_sum"
