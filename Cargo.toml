@@ -7,11 +7,11 @@ default-run = "dsa"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 
+# Auto-generated binary entries
 [[bin]]
 name = "practice"
 path = "practice/practice.rs"
 
-# Auto-generated binary entries
 [[bin]]
 name = "best_time_stocks"
 path = "01-arrays/best_time_stocks.rs"
@@ -39,6 +39,10 @@ path = "01-arrays/remove_duplicates.rs"
 [[bin]]
 name = "rotate_array"
 path = "01-arrays/rotate_array.rs"
+
+[[bin]]
+name = "search_rotated_array"
+path = "01-arrays/search_rotated_array.rs"
 
 [[bin]]
 name = "three_sum"
