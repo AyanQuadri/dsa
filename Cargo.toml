@@ -25,6 +25,10 @@ name = "maximum_subarray"
 path = "01-arrays/maximum_subarray.rs"
 
 [[bin]]
+name = "minimum_rotated_array"
+path = "01-arrays/minimum_rotated_array.rs"
+
+[[bin]]
 name = "plus_one"
 path = "01-arrays/plus_one.rs"
 
