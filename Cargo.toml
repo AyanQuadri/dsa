@@ -21,6 +21,10 @@ name = "contains_duplicate"
 path = "01-arrays/contains_duplicate.rs"
 
 [[bin]]
+name = "max_product_subarray"
+path = "01-arrays/max_product_subarray.rs"
+
+[[bin]]
 name = "maximum_subarray"
 path = "01-arrays/maximum_subarray.rs"
 
